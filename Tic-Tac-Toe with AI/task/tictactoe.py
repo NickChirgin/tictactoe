@@ -4,9 +4,11 @@ initial_state = "123456789"
 cell_list = []
 coordinate_list = []
 check_list = [1, 2, 3]
+x_step = ["X", "O"]
+o_step = ["O", "X"]
 for x in initial_state:
     cell_list.append(" ")
-start_list = ["start", "easy", "human"]
+start_list = ["start", "easy", "user", "medium"]
 
 cell_map = {1: [cell_list[0], cell_list[1], cell_list[2]],
             2: [cell_list[3], cell_list[4], cell_list[5]],
@@ -55,6 +57,45 @@ def is_valid_number(cd_list):
                 cd_input(cd_list)
 
 
+def medium_ai_bot(map, move, steps):
+    for step in steps:
+        if map.get(1)[0] == map.get(2)[1] == step and map.get(3)[2] == " ":
+            map.get(3)[2] = move
+        elif map.get(3)[2] == map.get(2)[1] == step and map.get(1)[0] == " ":
+            map.get(1)[0] = move
+        elif map.get(1)[0] == map.get(3)[2] == step and map.get(2)[1] == " ":
+            map.get(2)[1] = move
+        elif map.get(1)[2] == map.get(2)[1] == step and map.get(3)[0] == " ":
+            map.get(3)[0] = move
+        elif map.get(1)[2] == map.get(3)[0] == step and map.get(2)[1] == " ":
+            map.get(2)[1] = move
+        elif map.get(3)[0] == map.get(2)[1] == step and map.get(1)[2] == " ":
+            map.get(1)[2] = move
+        for x in map:
+            if map.get(x)[0] == map.get(x)[1] == step and map.get(x)[2] == " ":
+                map.get(x)[2] = move
+            elif map.get(x)[2] == map.get(x)[1] == step and map.get(x)[0] == " ":
+                map.get(x)[0] = move
+            elif map.get(x)[0] == map.get(x)[2] == step and map.get(x)[1] == " ":
+                map.get(x)[1] = move
+        for x in map:
+            if map.get(1)[x - 1] == map.get(2)[x - 1] == step and map.get(3)[x - 1] == " ":
+                map.get(3)[x - 1] = move
+            elif map.get(3)[x - 1] == map.get(2)[x - 1] == step and map.get(1)[x - 1] == " ":
+                map.get(1)[x - 1] = move
+            elif map.get(3)[x - 1] == map.get(1)[x - 1] == step and map.get(2)[x - 1] == " ":
+                map.get(2)[x - 1] = move
+    ai_coordinates = [random.randint(1, 3), random.randint(1, 3)]
+    if map.get(ai_coordinates[0])[ai_coordinates[1] - 1] == "X" or map.get(ai_coordinates[0])[
+        ai_coordinates[1] - 1] == "O":
+        print("This cell is occupied! Choose another one!")
+        medium_ai_bot(map, move, steps)
+    else:
+        map.get(ai_coordinates[0])[ai_coordinates[1] - 1] = move
+        print('Making move level "medium"')
+        grid_output(map)
+
+
 def easy_ai_move(map, move):
 
     ai_coordinates = [random.randint(1, 3), random.randint(1, 3)]
@@ -81,7 +122,6 @@ def human_move(coordinate_list, map, move):
 
 
 def win_checker(map):
-    print(map.get(1)[0] + " " + map.get(2)[1] + " " + map.get(3)[2])
     if map.get(1)[0] == map.get(2)[1] == map.get(3)[2] and map.get(1)[0] != " ":
         print(map.get(2)[1] + " wins")
         exit()
@@ -104,9 +144,9 @@ def win_checker(map):
         if map.get(x)[0] == " " or map.get(x)[1] == " " or map.get(x)[2] == " ":
 
             return True
-
-    print("Draw")
-    return False
+        else:
+            print("Draw")
+            return False
 
 
 def start_game(answer, map, coordinate_list):
@@ -114,15 +154,18 @@ def start_game(answer, map, coordinate_list):
     while True:
         if answer[1] == "easy":
             easy_ai_move(map, "X")
+        elif answer[1] == "medium":
+            medium_ai_bot(map, "X", x_step)
         else:
             human_move(coordinate_list, map, "X")
 
         if answer[2] == "easy":
             easy_ai_move(map, "O")
+        elif answer[2] == "medium":
+            medium_ai_bot(map, "O", o_step)
         else:
             human_move(coordinate_list, map, "O")
         win_checker(cell_map)
-
 
 
 start_game(first_input(), cell_map, coordinate_list)
